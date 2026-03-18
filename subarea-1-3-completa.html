@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subárea 1.3 — Técnicas de Documentación de Requerimientos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0B0F1A;font-family:'Crimson Pro',Georgia,serif;color:#CBD5E1}
+    button{cursor:pointer;border:none;font-family:'Crimson Pro',Georgia,serif}
+    ::selection{background:#7C3AED;color:#fff}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp 0.3s ease-out both}
+    .mono{font-family:'JetBrains Mono',monospace}
+    .ref{font-size:11px;color:#64748B;font-style:italic;margin-top:4px;line-height:1.5}
+    .ref strong{color:#94A3B8;font-style:normal}
+    a{color:#A78BFA;text-decoration:none} a:hover{text-decoration:underline}
+    ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState}=React;
+
+/* ═══════════════════════════════════════════════════════════════
+   TEORÍA — Dividida en Sesión 4 (martes) y Sesión 5 (jueves)
+═══════════════════════════════════════════════════════════════ */
+
+const theoryBlocks=[
+// ─────────────── SESIÓN 4: MARTES 17 MAR ───────────────
+{
+  session:4,id:"srs",title:"Documento SRS (IEEE 830 / ISO 29148)",icon:"📄",color:"#7C3AED",
+  content:`**¿Qué es el SRS?**
+El Software Requirements Specification (SRS) es el documento central que contiene TODOS los requisitos del sistema. Según Sommerville (2011, Cap. 4.3), es el contrato entre el cliente y el equipo de desarrollo — lo que está en el SRS es lo que se construye; lo que no está, no existe.
+
+**Estándar IEEE 830 (ahora ISO/IEC/IEEE 29148):**
+Pressman (2010, Cap. 7) y el SWEBOK v3.0 (Cap. 1.5) referencian la estructura del estándar IEEE 830 como la guía para escribir un SRS. Sus secciones principales son:
+
+**1. Introducción**
+• 1.1 Propósito del documento
+• 1.2 Alcance del producto (qué incluye y qué NO incluye)
+• 1.3 Definiciones, acrónimos y abreviaturas
+• 1.4 Referencias a otros documentos
+• 1.5 Visión general del documento
+
+**2. Descripción general**
+• 2.1 Perspectiva del producto (contexto, sistemas relacionados)
+• 2.2 Funciones del producto (resumen de alto nivel)
+• 2.3 Características de los usuarios
+• 2.4 Restricciones generales
+• 2.5 Suposiciones y dependencias
+
+**3. Requisitos específicos** (el corazón del SRS)
+• 3.1 Requisitos funcionales (organizados por función, caso de uso, o modo de operación)
+• 3.2 Requisitos de interfaz externa (UI, hardware, software, comunicaciones)
+• 3.3 Requisitos de rendimiento
+• 3.4 Restricciones de diseño
+• 3.5 Atributos de calidad (seguridad, mantenibilidad, portabilidad)
+
+**4. Apéndices** (modelos, prototipos, glosario extendido)
+
+**Propiedades de un buen SRS (IEEE 830 / McConnell):**
+Un SRS debe ser: Correcto, No ambiguo, Completo, Consistente, Clasificado por importancia, Verificable, Modificable y Trazable. Estas 8 propiedades son las de la checklist de McConnell.
+
+**PARA EL EGEL:** El SRS es el artefacto central de documentación. Conoce su estructura (especialmente la sección 3) y las 8 propiedades. El EGEL puede dar un fragmento de SRS y preguntar qué sección es o qué propiedad le falta.`,
+  ref:"Sommerville (2011) Cap. 4.3 · Pressman (2010) Cap. 7 · SWEBOK v3.0 Cap. 1.5 · IEEE 830 · McConnell Checklist"
+},
+{
+  session:4,id:"casosuso",title:"Casos de Uso (UML)",icon:"📐",color:"#3B82F6",
+  content:`**Definición según Pressman (2010, Cap. 6):**
+Un caso de uso describe una secuencia de interacciones entre un actor y el sistema para lograr un objetivo. Es la técnica de documentación más utilizada en proyectos orientados a objetos y en RUP.
+
+**Elementos del caso de uso:**
+• **Actor:** Entidad externa que interactúa con el sistema. Puede ser persona, otro sistema o dispositivo. Se representa como figura de palo (stick figure) en UML.
+• **Caso de uso:** Funcionalidad completa que entrega valor al actor. Se representa como óvalo/elipse.
+• **Sistema:** Rectángulo que contiene los casos de uso. Define los LÍMITES del sistema.
+
+**Relaciones entre casos de uso (Sommerville, 2011, Cap. 5):**
+• **«include» (inclusión):** El caso de uso BASE siempre ejecuta al incluido. Es obligatorio. Ej: "Realizar compra" INCLUYE "Procesar pago". Se usa para extraer comportamiento COMÚN reutilizable.
+• **«extend» (extensión):** El caso de uso extendido se ejecuta OPCIONALMENTE bajo ciertas condiciones. Ej: "Realizar compra" puede ser EXTENDIDO por "Aplicar cupón de descuento". Se usa para comportamiento CONDICIONAL.
+• **Generalización de actores:** Un actor hereda los casos de uso de otro. Ej: "Administrador" generaliza a "Usuario" (tiene todo lo de Usuario + más).
+
+**DIFERENCIA CLAVE include vs extend:**
+— Include: A siempre ejecuta B. La flecha va DE A HACIA B. A depende de B.
+— Extend: B opcionalmente extiende A. La flecha va DE B HACIA A. A funciona sin B.
+— La dirección de la flecha es OPUESTA: include apunta al incluido, extend apunta al base.
+
+**Plantilla de especificación de caso de uso (Wiegers & Beatty, 2013, Cap. 9):**
+• ID y nombre
+• Actor(es) principal(es)
+• Precondiciones (qué debe ser verdad ANTES)
+• Flujo principal (happy path — pasos numerados)
+• Flujos alternativos (variaciones válidas)
+• Flujos de excepción (errores y cómo manejarlos)
+• Postcondiciones (estado del sistema AL TERMINAR)
+• Requisitos especiales (no funcionales asociados)
+
+**Nivel de detalle (Pressman, 2010):**
+• **Resumen (brief):** 1-2 párrafos describiendo el escenario principal.
+• **Casual:** Varios párrafos cubriendo escenarios principales y alternativos.
+• **Completo (fully dressed):** Plantilla completa con todos los campos. Es el que se usa en el SRS formal.
+
+**PARA EL EGEL:** Las preguntas más frecuentes son: (1) dirección de flechas include vs extend, (2) cuándo usar cada relación, (3) identificar actor vs caso de uso, (4) leer un diagrama y determinar qué es opcional vs obligatorio.`,
+  ref:"Pressman (2010) Cap. 6 · Sommerville (2011) Cap. 5.2 · Wiegers & Beatty (2013) Cap. 9 · Wong (2017)"
+},
+{
+  session:4,id:"uml",title:"Diagramas UML para Requisitos",icon:"📊",color:"#06B6D4",
+  content:`**UML (Unified Modeling Language) según Sommerville (2011, Cap. 5):**
+UML es el lenguaje estándar de modelado visual para sistemas de software. Para la subárea 1.3, los diagramas relevantes para DOCUMENTAR requisitos son:
+
+**1. Diagrama de Casos de Uso:**
+Ya cubierto arriba. Muestra actores, casos de uso y sus relaciones. Es el diagrama MÁS usado para documentar requisitos funcionales visualmente.
+
+**2. Diagrama de Actividad:**
+Modela el FLUJO de un proceso o workflow. Elementos:
+• **Nodo inicial** (círculo negro lleno) y **nodo final** (círculo negro con anillo)
+• **Actividad/acción** (rectángulo redondeado)
+• **Decisión/bifurcación** (rombo) — con condiciones de guarda [condición]
+• **Fork/Join** (barra gruesa) — para flujos PARALELOS (concurrencia)
+• **Swimlanes (calles):** Dividen el diagrama por responsable/actor. Muestran QUIÉN hace QUÉ.
+
+Según Pressman (2010, Cap. 6), el diagrama de actividad es excelente para documentar procesos de negocio y flujos de trabajo que involucran múltiples actores.
+
+**3. Diagrama de Secuencia:**
+Modela la interacción TEMPORAL entre objetos/actores. Elementos:
+• **Lifeline (línea de vida):** Línea vertical punteada bajo cada objeto/actor
+• **Mensaje:** Flecha horizontal entre lifelines. Puede ser síncrono (punta llena) o asíncrono (punta abierta)
+• **Activación:** Rectángulo sobre la lifeline que indica que el objeto está procesando
+• **Fragmentos combinados:** alt (if/else), loop (repetición), opt (opcional)
+
+Según Sommerville (2011, Cap. 5.3), el diagrama de secuencia es ideal para documentar el comportamiento DINÁMICO: qué mensajes se intercambian y en qué ORDEN temporal.
+
+**4. Diagrama de Estados (Máquina de estados):**
+Modela el CICLO DE VIDA de una entidad. Elementos:
+• **Estado:** Rectángulo redondeado con nombre
+• **Transición:** Flecha con evento[condición]/acción
+• **Estado inicial** y **estado final**
+
+Útil para documentar requisitos donde una entidad tiene estados definidos (pedido, solicitud, ticket).
+
+**¿CUÁNDO USAR CADA UNO?**
+• Casos de uso → QUÉ hace el sistema (funcionalidad)
+• Actividad → CÓMO fluye un proceso (workflow)
+• Secuencia → EN QUÉ ORDEN interactúan los componentes (temporal)
+• Estados → POR QUÉ ETAPAS pasa una entidad (ciclo de vida)
+
+**PARA EL EGEL:** Darte un diagrama y preguntar qué tipo es. O darte un escenario y preguntar cuál diagrama usar. Clave: actividad = proceso/flujo, secuencia = orden temporal de mensajes, estados = ciclo de vida de un objeto.`,
+  ref:"Sommerville (2011) Cap. 5 · Pressman (2010) Cap. 6 · Wong (2017) · SWEBOK v3.0 Cap. 1.5"
+},
+{
+  session:4,id:"historias",title:"Historias de Usuario (User Stories)",icon:"📝",color:"#10B981",
+  content:`**Definición según Patton (2014) y Visual Paradigm:**
+Una historia de usuario es una descripción breve de una funcionalidad contada desde la perspectiva del usuario final. Es el formato preferido en metodologías ágiles (Scrum, XP).
+
+**Formato estándar (template de Connextra):**
+"Como [ROL/tipo de usuario],
+quiero [ACCIÓN/funcionalidad],
+para [BENEFICIO/valor de negocio]."
+
+Ejemplo: "Como cliente registrado, quiero recuperar mi contraseña por email, para poder acceder a mi cuenta si la olvido."
+
+**Los 3 componentes (las 3 C's — Ron Jeffries):**
+• **Card (Tarjeta):** La historia escrita en una tarjeta física o digital. Es BREVE — cabe en un post-it. NO es una especificación completa.
+• **Conversation (Conversación):** La discusión entre el equipo y el Product Owner para CLARIFICAR los detalles. La tarjeta es solo un recordatorio para tener esta conversación.
+• **Confirmation (Confirmación):** Los criterios de aceptación que definen cuándo la historia está TERMINADA. Son las condiciones verificables.
+
+**Criterios de aceptación:**
+Según Wiegers & Beatty (2013, Cap. 10), los criterios de aceptación son condiciones específicas que deben cumplirse para que la historia se considere completa:
+• "Dado que [contexto], cuando [acción], entonces [resultado esperado]" (formato Gherkin/BDD)
+• Son la parte VERIFICABLE de la historia
+• Sin criterios de aceptación, una historia es solo un deseo
+
+**INVEST — Propiedades de una buena historia (Bill Wake):**
+• **I**ndependent: No depende de otra historia para implementarse
+• **N**egotiable: No es un contrato fijo — es punto de partida para negociación
+• **V**aluable: Entrega valor al usuario o al negocio
+• **E**stimable: El equipo puede estimar su esfuerzo
+• **S**mall: Suficientemente pequeña para completarse en un sprint
+• **T**estable: Tiene criterios de aceptación verificables
+
+**Historias de usuario vs Casos de uso:**
+| Aspecto | Historia de usuario | Caso de uso |
+|---|---|---|
+| Detalle | Breve (post-it) | Detallado (páginas) |
+| Perspectiva | Usuario final | Sistema |
+| Metodología | Ágil (Scrum, XP) | Tradicional (RUP) |
+| Flujos de excepción | En criterios de aceptación | Sección explícita |
+| Completitud | Se completa con conversación | Auto-contenido |
+| Nivel | Requisito de usuario | Requisito de sistema |
+
+**Épicas y descomposición:**
+Una épica es una historia de usuario demasiado grande para un sprint. Se descompone en historias más pequeñas. Ej: Épica "Gestión de usuarios" → Historias: "Registrarse", "Iniciar sesión", "Recuperar contraseña", "Editar perfil".
+
+**PARA EL EGEL:** Clave: (1) conocer el formato Como/Quiero/Para, (2) las 3 C's, (3) INVEST, (4) diferencia con casos de uso, (5) saber identificar una historia MAL escrita (sin valor, sin rol, no testable).`,
+  ref:"Patton (2014) · Visual Paradigm · Wiegers & Beatty (2013) Cap. 10 · Pressman (2010)"
+},
+
+// ─────────────── SESIÓN 5: JUEVES 19 MAR ───────────────
+{
+  session:5,id:"usm",title:"User Story Mapping",icon:"🗺️",color:"#F59E0B",
+  content:`**Definición según Patton (2014):**
+User Story Mapping es una técnica visual para organizar historias de usuario en un mapa bidimensional que muestra el viaje completo del usuario con el sistema. Resuelve el problema del "backlog plano" donde las historias están en una lista sin contexto.
+
+**Estructura del mapa:**
+• **Eje horizontal (de izquierda a derecha):** Secuencia temporal — las ACTIVIDADES principales del usuario en orden cronológico. Es el "backbone" (columna vertebral) del mapa.
+• **Eje vertical (de arriba a abajo):** Detalle y prioridad — las TAREAS específicas dentro de cada actividad, ordenadas de más importante (arriba) a menos importante (abajo).
+
+**Ejemplo — Sistema de e-commerce:**
+Backbone (horizontal): Buscar producto → Ver detalle → Agregar al carrito → Pagar → Recibir confirmación
+Bajo "Pagar" (vertical): Ingresar datos de tarjeta → Seleccionar envío → Aplicar cupón → Pagar con PayPal
+
+**Releases/MVP:**
+Se trazan líneas horizontales para cortar el mapa en "rebanadas" (slices):
+• Todo lo que queda ARRIBA de la primera línea = MVP (Minimum Viable Product) / Release 1
+• Lo de abajo = releases futuros
+Cada rebanada debe ser un producto USABLE de principio a fin (walking skeleton).
+
+**Walking Skeleton:**
+Concepto de Patton: el MVP debe cubrir el flujo completo de izquierda a derecha aunque con funcionalidad mínima en cada paso. Es mejor un sistema que hace TODO el flujo de forma básica, que uno que hace la mitad del flujo de forma completa.
+
+**Beneficios según Patton:**
+• Visualiza el BIG PICTURE vs el backlog plano
+• Facilita la planificación de releases
+• Identifica gaps (¿falta algo en el flujo?)
+• Genera entendimiento compartido en el equipo
+• Ayuda a definir un MVP coherente
+
+**PARA EL EGEL:** El EGEL puede preguntar qué es el eje X vs Y del User Story Map, qué es el walking skeleton, y cómo se define un MVP con esta técnica. Patton (2014) es bibliografía directa del EGEL.`,
+  ref:"Patton (2014) – User Story Mapping · Visual Paradigm"
+},
+{
+  session:5,id:"estimacion",title:"Técnicas de Estimación",icon:"📏",color:"#EF4444",
+  content:`**¿Por qué estimar en documentación de requisitos?**
+Según Cubero (Blog Proyectum) y Usman et al. (2015), la estimación conecta los requisitos con la planificación: ¿cuánto va a costar implementar cada requisito? Esto alimenta la priorización y la planificación de releases.
+
+**Puntos de historia (Story Points):**
+Unidad RELATIVA de esfuerzo. No son horas ni días. Un requisito de 5 puntos es ~2.5 veces más esfuerzo que uno de 2 puntos. Se usa la secuencia de Fibonacci: 1, 2, 3, 5, 8, 13, 21, ∞.
+• ¿Por qué Fibonacci? Porque a mayor tamaño, mayor incertidumbre. Los saltos grandes (8→13→21) reflejan que las estimaciones grandes son inherentemente menos precisas.
+
+**Planning Poker (Usman et al., 2015):**
+1. El Product Owner presenta la historia de usuario
+2. El equipo discute brevemente para aclarar dudas
+3. Cada miembro elige una carta EN SECRETO (para evitar anclaje)
+4. Todos revelan simultáneamente
+5. Si hay diferencia grande (ej: 3 vs 13), los extremos explican su razonamiento
+6. Se re-estima hasta llegar a consenso
+• Clave: las cartas se eligen EN SECRETO para evitar el sesgo de anclaje (que la primera estimación dicha influya a los demás).
+
+**Puntos de Función (Function Points — Pressman, 2010, Cap. 23):**
+Miden el TAMAÑO funcional del software basándose en:
+• **EI (External Inputs):** Datos que entran al sistema
+• **EO (External Outputs):** Datos que salen del sistema
+• **EQ (External Queries):** Consultas que requieren entrada y salida
+• **ILF (Internal Logical Files):** Archivos/tablas mantenidos por el sistema
+• **EIF (External Interface Files):** Archivos/tablas de otros sistemas que el sistema lee
+Cada uno se clasifica como simple/promedio/complejo y se multiplica por un factor de peso.
+
+**COCOMO (solo mención — se cubre a fondo en Área 4):**
+Modelo de estimación de costo/esfuerzo basado en líneas de código. Lo verás en la subárea 4.1 con más detalle.
+
+**Velocidad del equipo (ágil):**
+Número de story points completados por sprint. Se usa para predecir cuántas historias caben en sprints futuros. Ej: si la velocidad promedio es 30 puntos/sprint y el backlog tiene 150 puntos, faltan ~5 sprints.
+
+**PARA EL EGEL:** Puntos de historia + Planning Poker son los más preguntados aquí. Saber que son RELATIVOS (no absolutos), que se usa Fibonacci, y que se estima EN SECRETO para evitar anclaje.`,
+  ref:"Usman et al. (2015) – ACM · Cubero – Proyectum · Pressman (2010) Cap. 23 · Patton (2014)"
+},
+{
+  session:5,id:"trazabilidad",title:"Trazabilidad y Gestión de Requisitos",icon:"🔗",color:"#8B5CF6",
+  content:`**Trazabilidad según Wiegers & Beatty (2013, Cap. 20):**
+La trazabilidad es la capacidad de rastrear cada requisito a lo largo de todo el ciclo de vida del proyecto: desde su origen hasta su implementación y prueba.
+
+**Tipos de trazabilidad (SWEBOK v3.0, Cap. 1.6):**
+• **Backward (hacia atrás):** De requisito → su ORIGEN (¿quién lo pidió? ¿por qué existe? ¿de qué documento, entrevista o regulación salió?)
+• **Forward (hacia adelante):** De requisito → ARTEFACTOS DERIVADOS (¿qué caso de uso lo detalla? ¿qué módulo lo implementa? ¿qué caso de prueba lo verifica?)
+
+**Matriz de trazabilidad bidireccional:**
+| ID Req | Origen | Caso de uso | Módulo diseño | Caso de prueba | Estado |
+|--------|--------|-------------|---------------|----------------|--------|
+| RF-001 | Entrevista #3, Juan (Gerente) | CU-005 | MOD-012 | TC-023, TC-024 | Implementado |
+| RF-002 | Regulación fiscal Art. 28 | CU-007 | MOD-015 | TC-030 | En desarrollo |
+| RF-003 | Taller JAD #2 | — | — | — | Sin asignar ⚠️ |
+
+RF-003 tiene un problema: no tiene caso de uso, diseño ni prueba → podría olvidarse.
+
+**Gestión de cambios en requisitos:**
+Sommerville (2011, Cap. 4.8) describe que los requisitos CAMBIAN inevitablemente. La gestión de cambios incluye:
+• **Baseline (línea base):** Versión "congelada" del SRS aprobada formalmente. Todo cambio después de la baseline pasa por un proceso formal.
+• **Control de cambios:** Solicitud de cambio → Análisis de impacto → Aprobación/rechazo → Implementación → Actualización de trazabilidad.
+• **Análisis de impacto:** Usando la matriz de trazabilidad, se determina qué otros artefactos se ven afectados si cambia un requisito.
+
+**Atributos de cada requisito:**
+Wiegers & Beatty (2013) recomiendan que cada requisito tenga metadatos:
+• ID único, versión, fecha de creación
+• Autor/origen
+• Prioridad (MoSCoW, valor)
+• Estado (propuesto, aprobado, implementado, verificado)
+• Complejidad/esfuerzo estimado
+• Riesgo asociado
+
+**PARA EL EGEL:** Forward vs backward traceability, para qué sirve el análisis de impacto, y qué es una baseline. Si preguntan "cómo saber si un cambio en el requisito X afecta al módulo Y" → la respuesta es trazar con la matriz.`,
+  ref:"Wiegers & Beatty (2013) Cap. 20 · Sommerville (2011) Cap. 4.8 · SWEBOK v3.0 Cap. 1.6"
+},
+{
+  session:5,id:"sysml",title:"SysML y otros formalismos",icon:"⚙️",color:"#64748B",
+  content:`**SysML (Systems Modeling Language) — sysml.org:**
+SysML es una extensión de UML diseñada para ingeniería de SISTEMAS (no solo software). Añade diagramas que UML no tiene:
+• **Diagrama de requisitos:** Único en SysML — permite modelar requisitos visualmente con relaciones de derivación, contención, satisfacción, verificación y refinamiento entre ellos.
+• **Diagrama de bloques (BDD):** Similar al diagrama de clases de UML pero para componentes de sistema (hardware + software).
+• **Diagrama paramétrico:** Para restricciones matemáticas y físicas.
+
+**¿Cuándo usar SysML vs UML?**
+• UML: Cuando documentas requisitos de SOFTWARE puro
+• SysML: Cuando el sistema incluye hardware, sensores, actuadores, redes — sistemas complejos embebidos o de ingeniería
+
+**Lenguaje natural estructurado (Sommerville, 2011, Cap. 4.3):**
+Plantillas para escribir requisitos en lenguaje natural con estructura fija:
+"El sistema DEBE [acción] [objeto] CUANDO [condición] EN [tiempo]"
+Ejemplo: "El sistema DEBE enviar una alerta al administrador CUANDO el disco alcance el 90% de capacidad EN menos de 30 segundos."
+
+Ventaja: combina la claridad del lenguaje natural con la estructura necesaria para evitar ambigüedades.
+
+**Tablas de decisión:**
+Para documentar requisitos con múltiples condiciones y acciones combinadas. Formato tabular que muestra: si condición A es verdadera Y condición B es falsa → acción X. Útil para reglas de negocio complejas.
+
+**PARA EL EGEL:** SysML aparece en la bibliografía. Saber que es para SISTEMAS (no solo software), que tiene diagrama de requisitos (UML no lo tiene), y cuándo elegirlo sobre UML.`,
+  ref:"SysML.org · Sommerville (2011) Cap. 4.3 · SWEBOK v3.0 Cap. 1.5"
+},
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   QUIZZES — 12 preguntas sesión 4, 12 preguntas sesión 5
+═══════════════════════════════════════════════════════════════ */
+
+const quizS4=[
+// SRS
+{q:"Un documento SRS contiene la sección «3.3 Requisitos de rendimiento» con el enunciado: «El sistema debe soportar 500 usuarios concurrentes con tiempo de respuesta <2s». Según IEEE 830, ¿en qué sección debería estar un requisito que dice «El sistema debe ser compatible con PostgreSQL 15»?",
+  opts:["3.3 Requisitos de rendimiento, junto al anterior","3.4 Restricciones de diseño","3.1 Requisitos funcionales","2.4 Restricciones generales"],
+  correct:1,exp:"Según IEEE 830 y Pressman (2010, Cap. 7), la compatibilidad con un DBMS específico es una restricción de DISEÑO (sección 3.4) porque limita las opciones de implementación. No es rendimiento (3.3), porque no mide velocidad. No es funcional (3.1), porque no describe qué HACE el sistema. La sección 2.4 es para restricciones de ALTO nivel — una tecnología específica va en 3.4.",ref:"Pressman (2010) Cap. 7 · IEEE 830",trap:"La trampa es 2.4 (Restricciones generales): suena similar pero la sección 2 es DESCRIPCIÓN GENERAL del producto, no especificación detallada. Las restricciones tecnológicas específicas van en la sección 3."},
+
+{q:"Un equipo entregó un SRS con 85 requisitos. El cliente dice que le falta una funcionalidad que habían discutido en una entrevista. Al revisar, la funcionalidad no está en el SRS. Según las propiedades de IEEE 830, ¿qué propiedad falló?",
+  opts:["Consistencia — hay contradicción entre el SRS y lo acordado","Completitud — el SRS no incluye todas las funcionalidades acordadas","Trazabilidad — no se puede rastrear el requisito a su origen","Verificabilidad — el requisito no es medible"],
+  correct:1,exp:"La COMPLETITUD según IEEE 830 y McConnell significa que el SRS contiene TODOS los requisitos significativos, funcionales y no funcionales. Si una funcionalidad acordada no aparece, el documento es incompleto. No es consistencia (que sería si dos requisitos se contradijeran), ni trazabilidad (que se refiere a vincular requisitos con su origen, no a si existen).",ref:"IEEE 830 · McConnell Checklist · Sommerville (2011) Cap. 4.7",trap:"La trampa es trazabilidad (C): parece correcto porque se menciona el origen (entrevista), pero la trazabilidad requiere que el requisito EXISTA primero para rastrearlo. El problema previo es que NO EXISTE en el SRS."},
+
+{q:"Un SRS dice en la sección 2.2: «El sistema permitirá gestión de inventario, ventas y reportes». Luego en la sección 3.1 hay requisitos detallados de inventario y ventas, pero NO hay ninguno de reportes. ¿Qué propiedades se violan?",
+  opts:["Solo verificabilidad","Solo consistencia","Completitud Y consistencia","Solo completitud"],
+  correct:2,exp:"Se violan DOS propiedades: COMPLETITUD (faltan los requisitos de reportes) y CONSISTENCIA (la sección 2.2 promete algo que la sección 3.1 no entrega — hay contradicción interna en el documento). Según IEEE 830, un SRS consistente no debe contradecirse internamente entre secciones.",ref:"IEEE 830 · Sommerville (2011) Cap. 4.7",trap:"La trampa es elegir solo completitud (D). Pero cuando la sección 2 menciona 'reportes' y la sección 3 no los tiene, también hay INCONSISTENCIA interna."},
+
+// CASOS DE USO
+{q:"En un diagrama de casos de uso, «Realizar compra» tiene una relación «include» con «Verificar stock» y una relación «extend» con «Aplicar descuento VIP». Un usuario NO VIP hace una compra. ¿Qué se ejecuta?",
+  opts:["Solo Realizar compra","Realizar compra + Verificar stock","Realizar compra + Verificar stock + Aplicar descuento VIP","Realizar compra + Aplicar descuento VIP"],
+  correct:1,exp:"Include es OBLIGATORIO: Verificar stock SIEMPRE se ejecuta. Extend es CONDICIONAL: Aplicar descuento VIP solo se ejecuta si el usuario ES VIP. Como el usuario NO es VIP, el extend no se activa. Resultado: Realizar compra + Verificar stock. Según Sommerville (2011, Cap. 5.2), include = siempre, extend = solo bajo condición.",ref:"Sommerville (2011) Cap. 5.2 · Pressman (2010) Cap. 6",trap:"La trampa es C (todo se ejecuta): muchos olvidan que extend es CONDICIONAL. Si no se cumple la condición (ser VIP), el caso extendido simplemente no ocurre."},
+
+{q:"En un diagrama de casos de uso, ¿hacia dónde apunta la flecha de «include» y hacia dónde la de «extend»?",
+  opts:["Include: del base al incluido. Extend: del base al extendido.","Include: del incluido al base. Extend: del extendido al base.","Include: del base al incluido. Extend: del extendido al base.","Include: del incluido al base. Extend: del base al extendido."],
+  correct:2,exp:"En UML según Pressman (2010) y Sommerville (2011): Include → la flecha va del caso BASE al caso INCLUIDO (A usa a B: A---include--->B). Extend → la flecha va del caso EXTENDIDO al caso BASE (B extiende a A: B---extend--->A). Las direcciones son OPUESTAS, lo cual es una fuente constante de confusión.",ref:"Pressman (2010) Cap. 6 · Sommerville (2011) Cap. 5.2",trap:"Esta pregunta es deliberadamente difícil porque las 4 opciones mezclan las direcciones. La clave: include apunta HACIA el incluido, extend apunta HACIA el base."},
+
+{q:"Un analista documenta un caso de uso «Generar reporte de ventas» con el flujo principal: 1) Usuario selecciona rango de fechas, 2) Sistema genera reporte, 3) Sistema muestra reporte. Un tester pregunta: «¿Y si no hay ventas en ese rango?». ¿Qué falta?",
+  opts:["Un flujo alternativo que maneje el escenario de rango sin datos","Un actor secundario para el tester","Una relación extend con otro caso de uso","Un requisito no funcional de rendimiento"],
+  correct:0,exp:"Según Wiegers & Beatty (2013, Cap. 9), un caso de uso completo debe tener flujos alternativos (variaciones válidas) y flujos de excepción (errores). «No hay ventas en el rango» es un flujo ALTERNATIVO legítimo — el sistema debería hacer algo (mostrar mensaje, sugerir otro rango). Sin esto, el desarrollador tiene que adivinar.",ref:"Wiegers & Beatty (2013) Cap. 9 · Pressman (2010) Cap. 6",trap:"La opción C suena técnica pero un escenario de 'sin datos' no es un caso de uso separado que extienda — es un FLUJO ALTERNATIVO dentro del mismo caso de uso."},
+
+// UML
+{q:"Un analista necesita documentar que cuando un cliente hace un pedido en la web, el sistema envía la orden al módulo de inventario, luego el inventario responde con la disponibilidad, y el sistema confirma al cliente. ¿Qué diagrama UML es el MÁS apropiado?",
+  opts:["Diagrama de actividad con swimlanes","Diagrama de secuencia","Diagrama de estados","Diagrama de casos de uso"],
+  correct:1,exp:"El escenario describe una secuencia TEMPORAL de mensajes entre componentes específicos (cliente → sistema → inventario → sistema → cliente). El diagrama de secuencia según Sommerville (2011, Cap. 5.3) modela exactamente esto: quién envía qué mensaje a quién y en qué orden. Actividad con swimlanes (A) podría funcionar pero no muestra el ORDEN TEMPORAL de mensajes con la misma claridad.",ref:"Sommerville (2011) Cap. 5.3 · Pressman (2010) Cap. 6",trap:"La trampa es actividad con swimlanes (A): puede modelar quién hace qué, pero su fortaleza es el FLUJO de proceso, no la secuencia temporal de mensajes entre componentes. Secuencia es más preciso aquí."},
+
+{q:"Un diagrama de actividad tiene una barra horizontal gruesa (fork) seguida de dos actividades paralelas, y luego otra barra (join). ¿Qué significa esto?",
+  opts:["Las dos actividades son opcionales — se ejecuta una u otra","Las dos actividades se ejecutan en SECUENCIA, una después de la otra","Las dos actividades se ejecutan en PARALELO y el flujo continúa cuando AMBAS terminan","Las dos actividades se ejecutan en paralelo y el flujo continúa cuando CUALQUIERA termina"],
+  correct:2,exp:"Según Sommerville (2011, Cap. 5) y la notación UML, fork/join modelan CONCURRENCIA: el fork divide el flujo en caminos paralelos, y el join SINCRONIZA — espera a que TODOS los caminos terminen antes de continuar. Si fuera 'cualquiera', sería un merge, no un join. La opción A describe un rombo de decisión, no un fork.",ref:"Sommerville (2011) Cap. 5 · Pressman (2010) Cap. 6",trap:"La trampa es D: join espera a que TODOS terminen, no solo uno. La diferencia entre join (todos) y merge (cualquiera) es sutil pero importante."},
+
+// HISTORIAS DE USUARIO
+{q:"Una historia dice: «Como administrador, quiero un sistema rápido.» ¿Cuáles criterios de INVEST viola?",
+  opts:["Solo Testable","Solo Valuable","Testable Y Valuable","Testable, Estimable Y Small"],
+  correct:2,exp:"Viola TESTABLE (¿cómo pruebas 'rápido'? no hay criterio medible) y VALUABLE (no explica el valor de negocio — falta el 'para [beneficio]'). Según el criterio INVEST y Wiegers & Beatty (2013), una historia debe entregar valor claro y ser verificable. 'Rápido' no es ninguno de los dos. No necesariamente viola Estimable (el equipo podría estimar 'mejorar rendimiento') ni Small (no sabemos el tamaño).",ref:"Wiegers & Beatty (2013) Cap. 10 · Patton (2014)",trap:"D suena como 'la más completa' pero Small y Estimable no se violan necesariamente. La clave es identificar EXACTAMENTE qué falla."},
+
+{q:"Un Product Owner escribe: «Como usuario, quiero que el sistema use React y PostgreSQL, para tener tecnología moderna.» ¿Cuál es el problema PRINCIPAL?",
+  opts:["No es una historia de usuario — es una restricción técnica/de diseño disfrazada de historia","Viola Independent porque depende de tecnologías específicas","Debería ser dos historias separadas: una para React y otra para PostgreSQL","El rol 'usuario' debería ser más específico"],
+  correct:0,exp:"Según Patton (2014) y Wiegers & Beatty (2013), las historias de usuario describen NECESIDADES del usuario, no decisiones de implementación. 'Usar React y PostgreSQL' es una restricción técnica que debería documentarse como tal en el SRS (sección 3.4 de IEEE 830), no como historia. El usuario no 'necesita' React — necesita una experiencia fluida. La tecnología es decisión del equipo técnico.",ref:"Patton (2014) · Wiegers & Beatty (2013) Cap. 10 · IEEE 830",trap:"C suena razonable pero dividirla en dos no resuelve el problema: seguirían siendo restricciones técnicas disfrazadas de historias."},
+
+{q:"¿Cuál de estas es la MEJOR historia de usuario?",
+  opts:["Como admin, quiero gestionar usuarios","Como cliente, quiero buscar productos por nombre, categoría o precio para encontrar rápidamente lo que necesito","Como sistema, quiero validar los datos de entrada para evitar errores en la base de datos","Como usuario, quiero que el sistema sea bonito y fácil de usar"],
+  correct:1,exp:"B cumple INVEST: tiene rol específico (cliente), acción concreta (buscar por nombre/categoría/precio), valor claro (encontrar rápido). A no tiene 'para' (sin valor). C usa 'como sistema' (el sistema no es un actor — las historias son desde la perspectiva del USUARIO). D es vaga y no verificable. Según Visual Paradigm y Patton (2014), el formato correcto es rol+acción+valor.",ref:"Patton (2014) · Visual Paradigm · Wiegers & Beatty (2013) Cap. 10",trap:"C es la trampa más fuerte: técnicamente tiene la estructura Como/Quiero/Para, pero el 'actor' es el sistema, lo cual viola el principio de que las historias son desde la perspectiva del USUARIO."},
+
+{q:"Un equipo tiene la historia: «Como comprador, quiero realizar una compra completa incluyendo buscar productos, agregar al carrito, seleccionar envío, pagar con múltiples métodos y recibir factura, para completar mi pedido.» ¿Qué es esto?",
+  opts:["Una historia de usuario bien escrita y detallada","Una épica que necesita descomponerse en historias más pequeñas","Un caso de uso en formato de historia","Un requisito no funcional"],
+  correct:1,exp:"Según Patton (2014), esta es una ÉPICA: cubre demasiadas funcionalidades para un sprint. Viola la S de INVEST (Small). Debe descomponerse: 'Buscar productos', 'Agregar al carrito', 'Seleccionar envío', 'Pagar con tarjeta', 'Recibir factura' serían historias individuales. Cada una debe caber en un sprint y entregar valor por sí sola.",ref:"Patton (2014) · Wiegers & Beatty (2013) Cap. 10",trap:"A suena bien porque tiene el formato correcto y mucho detalle, pero INVEST dice que una historia debe ser SMALL. El detalle excesivo es señal de épica."},
+];
+
+const quizS5=[
+// USER STORY MAPPING
+{q:"En un User Story Map, el eje horizontal (backbone) representa 'Registrarse → Buscar → Comprar → Recibir'. Debajo de 'Comprar' están verticalmente: 'Pagar con tarjeta', 'Pagar con PayPal', 'Aplicar cupón'. El equipo traza la línea del MVP. ¿Cuál opción representa el MVP MÁS coherente?",
+  opts:["Solo 'Pagar con tarjeta' y 'Aplicar cupón' bajo Comprar, pero nada bajo las demás actividades","Las primeras tareas bajo CADA actividad del backbone: un flujo completo de izquierda a derecha","Todas las tareas bajo 'Comprar' y 'Recibir' pero nada bajo 'Registrarse'","Solo las actividades del backbone sin ninguna tarea debajo"],
+  correct:1,exp:"Según Patton (2014), el MVP debe ser un 'walking skeleton': cubrir el flujo COMPLETO de izquierda a derecha con funcionalidad mínima en cada paso. Es mejor un sistema que permite registrarse (básico) → buscar (básico) → comprar (con tarjeta) → recibir (confirmación) que uno que tiene pagos perfectos pero no tiene registro. Cada actividad del backbone necesita al menos una tarea.",ref:"Patton (2014) – User Story Mapping",trap:"A solo cubre una actividad. C omite el registro (el usuario no podría ni entrar). D no tiene funcionalidad. B es el walking skeleton: flujo completo aunque básico."},
+
+{q:"Un equipo tiene un Product Backlog con 60 historias en una lista plana priorizada. El PO dice: «No entiendo cómo encajan estas historias en el flujo del usuario». ¿Qué técnica resuelve este problema?",
+  opts:["Re-priorizar con MoSCoW","Escribir un documento SRS con todas las historias","Crear un User Story Map para visualizar el flujo completo","Convertir las historias en casos de uso"],
+  correct:2,exp:"Este es EXACTAMENTE el problema que User Story Mapping resuelve según Patton (2014): un backlog plano (lista) pierde el contexto del viaje del usuario. El mapa bidimensional (actividades × detalle) permite ver cómo encajan las historias en el flujo completo y dónde hay huecos.",ref:"Patton (2014)",trap:"MoSCoW (A) re-prioriza pero no da contexto de flujo. SRS (B) es un formato diferente pero no resuelve la visualización. Convertir a casos de uso (D) cambia el formato pero no organiza el flujo visualmente."},
+
+{q:"En un User Story Map, el equipo descubre que hay actividades en el backbone ('Configurar notificaciones') que no tienen NINGUNA historia debajo. ¿Qué significa esto?",
+  opts:["La actividad no es importante y debe eliminarse","Hay un GAP: se identificó una necesidad del usuario pero no se han escrito las historias que la implementan","El User Story Map está mal construido","Las historias de esa actividad ya fueron implementadas"],
+  correct:1,exp:"Según Patton (2014), una actividad en el backbone sin historias debajo es un GAP — un área donde el usuario tiene una necesidad pero el equipo aún no ha definido cómo resolverla. Es una de las ventajas del USM: visualiza estas brechas que en un backlog plano serían invisibles.",ref:"Patton (2014)",trap:"A es peligroso: que no tenga historias no significa que no sea importante. C es incorrecto: el backbone puede tener actividades pendientes de detallar. El mapa REVELA el gap, no lo causa."},
+
+// ESTIMACIÓN
+{q:"En Planning Poker, un desarrollador junior estima 3 puntos y un senior estima 13. Después de discutir, el junior entiende que hay una integración compleja que no conocía. En la re-estimación, el junior cambia a 8 y el senior se mantiene en 13. ¿Qué debería pasar?",
+  opts:["Usar la estimación del senior porque tiene más experiencia","Promediar: (8+13)/2 ≈ 10 puntos","Aceptar el consenso aproximado (8-13 está suficientemente cerca) o discutir brevemente una vez más","Usar la estimación más alta (13) por precaución"],
+  correct:2,exp:"Según Usman et al. (2015), en Planning Poker el objetivo es CONSENSO, no unanimidad. Si después de una ronda de discusión las estimaciones están en rango razonable (8 vs 13, ambos en la zona alta), el equipo puede aceptar un valor intermedio o hacer una última ronda rápida. NUNCA se usa antigüedad para decidir (A), se promedia (B), ni se toma la más alta automáticamente (D).",ref:"Usman et al. (2015) – ACM",trap:"D ('la más alta por precaución') suena prudente pero introduce un sesgo sistemático hacia sobre-estimación que distorsiona la velocidad del equipo."},
+
+{q:"¿Por qué en Planning Poker las cartas se revelan SIMULTÁNEAMENTE y no uno por uno?",
+  opts:["Para ahorrar tiempo en la sesión","Para evitar el sesgo de anclaje: que la primera estimación dicha influya a los demás","Porque es una tradición de Scrum sin razón técnica","Para que el Scrum Master no sepa quién estimó qué"],
+  correct:1,exp:"El sesgo de anclaje (anchoring bias) según Usman et al. (2015) es un fenómeno cognitivo donde el primer número mencionado 'ancla' las estimaciones de los demás. Si el senior dice '13' primero, los juniors tienden a estimar más alto de lo que habrían estimado solos. Revelar simultáneamente garantiza estimaciones independientes.",ref:"Usman et al. (2015) – ACM",trap:"A suena práctico pero la razón es cognitiva, no logística. C es falso: hay una razón psicológica clara. D es incorrecto: las estimaciones son visibles para todos."},
+
+{q:"Un equipo usa puntos de historia con Fibonacci. Una historia se estimó en 21 puntos. ¿Qué debería hacer el equipo?",
+  opts:["Implementarla en un sprint largo de 4 semanas","Descomponerla en historias más pequeñas (probablemente es una épica)","Asignarla al desarrollador más experimentado","Estimarla en horas en lugar de puntos para mayor precisión"],
+  correct:1,exp:"Según Patton (2014) y Usman et al. (2015), una estimación de 21 puntos generalmente indica que la historia es demasiado grande y tiene demasiada incertidumbre. La práctica recomendada es descomponerla en historias más pequeñas (5-8 puntos cada una) que sean más predecibles y quepan en un sprint estándar. 21 puntos en Fibonacci refleja alta incertidumbre.",ref:"Usman et al. (2015) · Patton (2014)",trap:"A cambia la duración del sprint (no recomendado). C no reduce la complejidad. D cambia la unidad pero no el problema de tamaño."},
+
+{q:"¿Cuál es la diferencia FUNDAMENTAL entre story points y puntos de función?",
+  opts:["Story points se usan en ágil y puntos de función en cascada — son lo mismo con diferente nombre","Story points miden esfuerzo RELATIVO del equipo; puntos de función miden tamaño FUNCIONAL absoluto del software","Story points son más precisos que los puntos de función","Puntos de función se calculan más rápido que story points"],
+  correct:1,exp:"Story points según Usman et al. (2015) son RELATIVOS al equipo que estima: 5 puntos para un equipo A puede ser diferente que para un equipo B. Puntos de función según Pressman (2010, Cap. 23) miden el TAMAÑO funcional del software de forma absoluta basándose en entradas, salidas, consultas y archivos — son independientes del equipo.",ref:"Usman et al. (2015) · Pressman (2010) Cap. 23",trap:"A es la trampa: NO son lo mismo. Story points son subjetivos y relativos, puntos de función son objetivos y absolutos. Se usan en contextos diferentes."},
+
+// TRAZABILIDAD
+{q:"Un cambio en el requisito RF-015 requiere análisis de impacto. La matriz de trazabilidad muestra que RF-015 está vinculado a: CU-008, CU-012 (casos de uso), MOD-003, MOD-007 (módulos), y TC-019, TC-025, TC-031 (pruebas). ¿Cuántos artefactos PODRÍAN verse afectados por el cambio?",
+  opts:["Solo RF-015 — el cambio es solo en el requisito","Los 2 casos de uso + 2 módulos = 4 artefactos","Los 2 casos de uso + 2 módulos + 3 pruebas = 7 artefactos","No se puede determinar sin revisar cada artefacto individualmente"],
+  correct:2,exp:"Según Wiegers & Beatty (2013, Cap. 20), el análisis de impacto con la matriz de trazabilidad identifica TODOS los artefactos vinculados al requisito cambiado. Cada uno PODRÍA necesitar actualización: los casos de uso (la especificación puede cambiar), los módulos (el código puede cambiar) y las pruebas (los criterios pueden cambiar). Son 7 artefactos potencialmente impactados.",ref:"Wiegers & Beatty (2013) Cap. 20 · Sommerville (2011) Cap. 4.8",trap:"D suena prudente pero la pregunta dice PODRÍAN (no 'se ven'). La matriz sí permite determinar los candidatos a impacto. La revisión individual viene DESPUÉS de identificarlos."},
+
+{q:"Un nuevo requisito regulatorio obliga a agregar autenticación de dos factores. El SRS ya tiene baseline aprobada. ¿Cuál es el proceso correcto según Sommerville?",
+  opts:["Agregar el requisito directamente al SRS porque es regulatorio y obligatorio","Solicitud de cambio → análisis de impacto → aprobación → modificar SRS → actualizar trazabilidad","Crear un SRS nuevo separado para los requisitos regulatorios","Documentarlo como historia de usuario y agregarlo al backlog"],
+  correct:1,exp:"Según Sommerville (2011, Cap. 4.8), una vez establecida la baseline, TODO cambio — incluso los obligatorios — pasa por el proceso formal de control de cambios. No se salta el análisis de impacto solo porque es regulatorio: hay que entender qué módulos, pruebas y otros requisitos se ven afectados. El proceso no decide SI se hace (es obligatorio) sino CÓMO se implementa de forma controlada.",ref:"Sommerville (2011) Cap. 4.8 · Wiegers & Beatty (2013)",trap:"A es la trampa más peligrosa: que sea obligatorio no significa que se pueda agregar sin análisis. Sin análisis de impacto podrías romper funcionalidad existente."},
+
+{q:"¿Cuál es la diferencia entre trazabilidad FORWARD y BACKWARD?",
+  opts:["Forward rastrea del código al requisito; Backward rastrea del requisito al código","Forward rastrea del requisito hacia diseño/código/pruebas; Backward rastrea desde diseño/código/pruebas hacia el requisito y su origen","Forward es para requisitos funcionales; Backward es para no funcionales","Forward se usa en desarrollo ágil; Backward en desarrollo cascada"],
+  correct:1,exp:"Según Wiegers & Beatty (2013, Cap. 20) y el SWEBOK v3.0: Forward = seguir un requisito HACIA ADELANTE en el ciclo de vida (req → diseño → código → prueba). Backward = desde cualquier artefacto HACIA ATRÁS hasta el requisito y su ORIGEN (prueba → código → diseño → req → entrevista con Juan). Ambas direcciones son necesarias.",ref:"Wiegers & Beatty (2013) Cap. 20 · SWEBOK v3.0 Cap. 1.6",trap:"A invierte las definiciones — es la trampa directa. C y D son falsos: ambos tipos aplican a todos los requisitos y metodologías."},
+
+// SysML / OTROS
+{q:"Un proyecto involucra un sistema de control de temperatura con sensores de hardware, software embebido y una app móvil. ¿Qué lenguaje de modelado es MÁS apropiado para documentar los requisitos del SISTEMA COMPLETO?",
+  opts:["UML, porque es el estándar de la industria para software","SysML, porque está diseñado para sistemas que incluyen hardware y software","BPMN, porque modela procesos de negocio","Solo lenguaje natural estructurado, sin diagramas"],
+  correct:1,exp:"Según SysML.org y el SWEBOK v3.0, SysML extiende UML con diagramas específicos para ingeniería de SISTEMAS (no solo software): diagrama de requisitos, diagrama de bloques, diagrama paramétrico. Cuando el sistema incluye hardware (sensores), software embebido y apps, SysML modela las interacciones entre todos estos componentes. UML solo cubre la parte de software.",ref:"SysML.org · SWEBOK v3.0 Cap. 1.5",trap:"UML (A) es fuerte pero no tiene diagrama de requisitos ni modela hardware/sensores de forma nativa. SysML fue creado específicamente para este tipo de sistemas."},
+
+{q:"Un analista documenta una regla de negocio compleja: «Si el cliente es VIP Y el monto supera $1000, aplicar 15% de descuento. Si el cliente es VIP Y el monto es menor a $1000, aplicar 10%. Si no es VIP Y el monto supera $5000, aplicar 5%. En cualquier otro caso, no aplicar descuento.» ¿Cuál es la forma MÁS clara de documentar esto?",
+  opts:["Un caso de uso con flujos alternativos para cada combinación","Una tabla de decisión con condiciones y acciones","Un diagrama de secuencia mostrando cada escenario","Cuatro historias de usuario separadas"],
+  correct:1,exp:"Según Sommerville (2011, Cap. 4.3), las tablas de decisión son la herramienta ideal para documentar reglas de negocio con MÚLTIPLES CONDICIONES combinadas. Cada fila representa una combinación de condiciones (VIP sí/no, monto alto/bajo) y la acción correspondiente. Un caso de uso (A) se vuelve ilegible con tantas ramificaciones. Cuatro historias (D) fragmentan una regla única.",ref:"Sommerville (2011) Cap. 4.3 · Wiegers & Beatty (2013)",trap:"A funcionaría pero sería confuso con 4+ flujos alternativos anidados. La tabla de decisión es mucho más clara para reglas combinatorias."},
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENTE APP
+═══════════════════════════════════════════════════════════════ */
+function App(){
+  const [view,setView]=useState("menu"); // menu, theory, quiz, results
+  const [session,setSession]=useState(4);
+  const [techIdx,setTechIdx]=useState(0);
+  const [quizMode,setQuizMode]=useState(null); // "s4","s5","all"
+  const [questions,setQuestions]=useState([]);
+  const [cur,setCur]=useState(0);
+  const [ans,setAns]=useState({});
+  const [showTrap,setShowTrap]=useState({});
+
+  const sessionBlocks=theoryBlocks.filter(b=>b.session===session);
+  const cats={s4:"Sesión 4 (Martes)",s5:"Sesión 5 (Jueves)",all:"Simulacro completo"};
+  const catColors={s4:"#7C3AED",s5:"#F59E0B",all:"#EF4444"};
+
+  const startQuiz=(mode)=>{
+    let qs=mode==="s4"?[...quizS4]:mode==="s5"?[...quizS5]:[...quizS4,...quizS5];
+    qs.sort(()=>Math.random()-0.5);
+    setQuestions(qs);setQuizMode(mode);setCur(0);setAns({});setShowTrap({});setView("quiz");
+  };
+
+  const handleAns=(i)=>{if(ans[cur]!==undefined)return;setAns(p=>({...p,[cur]:i}))};
+  const score=Object.entries(ans).filter(([k,v])=>v===questions[+k]?.correct).length;
+  const allDone=questions.length>0&&Object.keys(ans).length===questions.length;
+
+  const fmt=(text)=>text.split('\n').map((line,i)=>{
+    line=line.trim();
+    if(!line) return <div key={i} style={{height:6}}/>;
+    let parts=line.split(/\*\*(.*?)\*\*/g);
+    let r=parts.map((p,j)=>j%2===1?<strong key={j} style={{color:"#E2E8F0"}}>{p}</strong>:<span key={j}>{p}</span>);
+    if(line.startsWith('•')||line.startsWith('—')||line.startsWith('|'))
+      return <div key={i} style={{paddingLeft:line.startsWith('|')?0:16,fontSize:14,lineHeight:1.75,color:"#B0BEC5",fontFamily:line.startsWith('|')?"'JetBrains Mono',monospace":"inherit",fontSize:line.startsWith('|')?12:14}}>{r}</div>;
+    return <div key={i} style={{fontSize:14,lineHeight:1.75,color:"#B0BEC5"}}>{r}</div>;
+  });
+
+  return (
+    <div style={{minHeight:"100vh",background:"#0B0F1A",padding:"14px 10px 40px"}}>
+      <div style={{maxWidth:920,margin:"0 auto"}}>
+
+        {/* HEADER */}
+        <div style={{background:"linear-gradient(135deg,#0F172A,#1a1530 50%,#0F172A)",border:"1px solid #7C3AED30",borderRadius:16,padding:"24px 22px",marginBottom:18,position:"relative",overflow:"hidden"}}>
+          <div style={{position:"absolute",top:-30,right:-30,width:160,height:160,background:"radial-gradient(circle,rgba(124,58,237,0.07),transparent 70%)"}}/>
+          <div className="mono" style={{fontSize:9,letterSpacing:3,color:"#475569",marginBottom:5}}>EGEL PLUS · ISOFT · ÁREA 1 · SUBÁREA 1.3 · 10 REACTIVOS</div>
+          <h1 style={{fontSize:20,fontWeight:700,color:"#F1F5F9"}}>Técnicas de Documentación de Requerimientos</h1>
+          <p style={{color:"#64748B",fontSize:13,marginTop:5}}>SRS · Casos de uso · UML · Historias de usuario · User Story Mapping · Estimación · Trazabilidad · SysML</p>
+          <div style={{display:"flex",gap:10,marginTop:14,flexWrap:"wrap"}}>
+            <div style={{background:"#7C3AED15",border:"1px solid #7C3AED30",borderRadius:8,padding:"6px 14px"}}>
+              <div style={{fontSize:11,color:"#A78BFA",fontWeight:600}}>📅 Mar 17 — Sesión 4</div>
+              <div style={{fontSize:10,color:"#64748B"}}>SRS, Casos de uso, UML, Historias</div>
+            </div>
+            <div style={{background:"#F59E0B15",border:"1px solid #F59E0B30",borderRadius:8,padding:"6px 14px"}}>
+              <div style={{fontSize:11,color:"#FCD34D",fontWeight:600}}>📅 Jue 19 — Sesión 5</div>
+              <div style={{fontSize:10,color:"#64748B"}}>Story Mapping, Estimación, Trazabilidad</div>
+            </div>
+          </div>
+        </div>
+
+        {/* NAV */}
+        <div style={{display:"flex",gap:5,marginBottom:14,flexWrap:"wrap"}}>
+          {[["menu","🏠 Menú"],["theory","📖 Teoría"],["quiz","🧪 Quizzes"]].map(([k,l])=>
+            <button key={k} onClick={()=>setView(k)} style={{padding:"8px 15px",borderRadius:9,fontSize:13,fontWeight:view===k?700:400,background:view===k?"#7C3AED":"#111827",color:view===k?"#fff":"#64748B",border:view===k?"none":"1px solid #1E293B"}}>{l}</button>
+          )}
+        </div>
+
+        {/* ═══════ MENÚ ═══════ */}
+        {view==="menu" && <div className="fade-up" style={{display:"grid",gap:10}}>
+          <button onClick={()=>{setSession(4);setTechIdx(0);setView("theory")}} style={{background:"#111827",border:"1px solid #7C3AED30",borderRadius:12,padding:"18px 20px",textAlign:"left"}}>
+            <div style={{fontSize:16,fontWeight:700,color:"#A78BFA"}}>📖 Teoría — Sesión 4 (Martes 17)</div>
+            <div style={{fontSize:13,color:"#64748B",marginTop:4}}>SRS (IEEE 830) · Casos de uso y relaciones · Diagramas UML · Historias de usuario e INVEST</div>
+          </button>
+          <button onClick={()=>{setSession(5);setTechIdx(0);setView("theory")}} style={{background:"#111827",border:"1px solid #F59E0B30",borderRadius:12,padding:"18px 20px",textAlign:"left"}}>
+            <div style={{fontSize:16,fontWeight:700,color:"#FCD34D"}}>📖 Teoría — Sesión 5 (Jueves 19)</div>
+            <div style={{fontSize:13,color:"#64748B",marginTop:4}}>User Story Mapping · Estimación (Story Points, Planning Poker, Puntos de función) · Trazabilidad · SysML</div>
+          </button>
+          <div style={{borderTop:"1px solid #1E293B",paddingTop:12,marginTop:4}}>
+            <div style={{fontSize:12,color:"#475569",marginBottom:8}} className="mono">QUIZZES DE PRÁCTICA</div>
+            {[["s4","🧪 Quiz Sesión 4","12 preguntas — SRS, Casos de uso, UML, Historias","#7C3AED"],
+              ["s5","🧪 Quiz Sesión 5","12 preguntas — Story Mapping, Estimación, Trazabilidad, SysML","#F59E0B"],
+              ["all","🔥 Simulacro Completo 1.3","24 preguntas mezcladas — toda la subárea","#EF4444"]
+            ].map(([m,t,d,c])=>
+              <button key={m} onClick={()=>startQuiz(m)} style={{background:"#111827",border:"1px solid "+c+"30",borderRadius:10,padding:"14px 18px",textAlign:"left",width:"100%",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontSize:14,fontWeight:700,color:c}}>{t}</div>
+                  <div style={{fontSize:12,color:"#64748B",marginTop:2}}>{d}</div>
+                </div>
+                <span style={{color:c,fontSize:13,fontWeight:600}}>Iniciar →</span>
+              </button>
+            )}
+          </div>
+        </div>}
+
+        {/* ═══════ TEORÍA ═══════ */}
+        {view==="theory" && <div className="fade-up">
+          <div style={{display:"flex",gap:5,marginBottom:10}}>
+            <button onClick={()=>{setSession(4);setTechIdx(0)}} style={{padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:session===4?700:400,background:session===4?"#7C3AED20":"#111827",color:session===4?"#A78BFA":"#64748B",border:"1px solid "+(session===4?"#7C3AED40":"#1E293B")}}>Sesión 4 (Martes)</button>
+            <button onClick={()=>{setSession(5);setTechIdx(0)}} style={{padding:"6px 14px",borderRadius:8,fontSize:12,fontWeight:session===5?700:400,background:session===5?"#F59E0B20":"#111827",color:session===5?"#FCD34D":"#64748B",border:"1px solid "+(session===5?"#F59E0B40":"#1E293B")}}>Sesión 5 (Jueves)</button>
+          </div>
+          <div style={{display:"flex",gap:5,marginBottom:12,flexWrap:"wrap"}}>
+            {sessionBlocks.map((b,i)=>
+              <button key={b.id} onClick={()=>setTechIdx(i)} style={{padding:"6px 12px",borderRadius:20,fontSize:11,background:techIdx===i?b.color:"#0B0F1A",color:techIdx===i?"#fff":"#64748B",border:"1px solid "+(techIdx===i?b.color:"#1E293B")}}>{b.icon} {b.title.split('(')[0].split('—')[0].trim().substring(0,22)}</button>
+            )}
+          </div>
+          {sessionBlocks[techIdx] && <div style={{background:"#111827",border:"1px solid #1E293B",borderRadius:14,overflow:"hidden"}}>
+            <div style={{background:sessionBlocks[techIdx].color+"08",borderBottom:"1px solid "+sessionBlocks[techIdx].color+"20",padding:"20px 22px"}}>
+              <h2 style={{fontSize:18,fontWeight:700,color:"#F1F5F9"}}>{sessionBlocks[techIdx].icon} {sessionBlocks[techIdx].title}</h2>
+            </div>
+            <div style={{padding:"20px 22px"}}>
+              {fmt(sessionBlocks[techIdx].content)}
+              <div className="ref" style={{marginTop:14,padding:"10px 14px",background:"#0B0F1A",borderRadius:8,border:"1px solid #1E293B"}}>📖 <strong>Referencias:</strong> {sessionBlocks[techIdx].ref}</div>
+            </div>
+          </div>}
+        </div>}
+
+        {/* ═══════ QUIZ ═══════ */}
+        {view==="quiz" && !quizMode && <div className="fade-up">
+          <div style={{fontSize:14,color:"#94A3B8",marginBottom:14}}>Selecciona un quiz desde el menú principal.</div>
+          <button onClick={()=>setView("menu")} style={{padding:"8px 16px",borderRadius:8,fontSize:13,background:"#1E293B",color:"#94A3B8"}}>← Ir al menú</button>
+        </div>}
+
+        {view==="quiz" && quizMode && questions.length>0 && <div className="fade-up">
+          <div style={{background:"#111827",border:"1px solid #1E293B",borderRadius:14,overflow:"hidden"}}>
+            <div style={{padding:"12px 20px",borderBottom:"1px solid #1E293B",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+              <div>
+                <div style={{fontSize:14,fontWeight:700,color:catColors[quizMode]}}>{cats[quizMode]}</div>
+                <div style={{fontSize:11,color:"#475569"}}>{cur+1}/{questions.length} · Aciertos: {score}/{Object.keys(ans).length||0}</div>
+              </div>
+              <button onClick={()=>{setView("menu");setQuizMode(null)}} style={{padding:"5px 12px",borderRadius:6,fontSize:11,background:"#1E293B",color:"#64748B",border:"1px solid #334155"}}>← Salir</button>
+            </div>
+            <div style={{height:3,background:"#1E293B"}}><div style={{height:"100%",width:((cur+1)/questions.length*100)+"%",background:catColors[quizMode],transition:"width 0.3s"}}/></div>
+
+            <div style={{padding:"20px"}}>
+              <div style={{fontSize:15,fontWeight:600,color:"#E2E8F0",lineHeight:1.65,marginBottom:16}}>{questions[cur].q}</div>
+              <div style={{display:"grid",gap:7}}>
+                {questions[cur].opts.map((opt,i)=>{
+                  const answered=ans[cur]!==undefined;
+                  const isSel=ans[cur]===i,isCor=i===questions[cur].correct;
+                  let bg="#0B0F1A",brd="#1E293B",col="#94A3B8";
+                  if(answered){if(isCor){bg="#4ADE800D";brd="#4ADE8050";col="#4ADE80";}else if(isSel){bg="#F871710D";brd="#F8717150";col="#F87171";}}
+                  return <button key={i} onClick={()=>handleAns(i)} style={{background:bg,border:"1px solid "+brd,borderRadius:10,padding:"11px 15px",textAlign:"left",fontSize:14,color:col,cursor:answered?"default":"pointer",lineHeight:1.5}}>
+                    <span style={{fontWeight:700,marginRight:8,opacity:0.5}}>{String.fromCharCode(65+i)}.</span>{opt}{answered&&isCor?" ✓":""}{answered&&isSel&&!isCor?" ✗":""}
+                  </button>
+                })}
+              </div>
+              {ans[cur]!==undefined && <div style={{marginTop:14}}>
+                <div style={{background:"#0c1a2e",border:"1px solid #1E3A5F",borderRadius:10,padding:"14px 16px"}}>
+                  <div className="mono" style={{fontSize:10,letterSpacing:2,color:"#93C5FD",marginBottom:5,fontWeight:600}}>EXPLICACIÓN</div>
+                  <div style={{fontSize:13,color:"#CBD5E1",lineHeight:1.7}}>{questions[cur].exp}</div>
+                  <div className="ref" style={{marginTop:6}}>📖 <strong>Ref:</strong> {questions[cur].ref}</div>
+                </div>
+                {questions[cur].trap && <button onClick={()=>setShowTrap(p=>({...p,[cur]:!p[cur]}))} style={{marginTop:8,padding:"8px 14px",borderRadius:8,fontSize:12,background:showTrap[cur]?"#F59E0B15":"#1E293B",color:showTrap[cur]?"#FCD34D":"#64748B",border:"1px solid "+(showTrap[cur]?"#F59E0B30":"#334155"),width:"100%",textAlign:"left"}}>
+                  {showTrap[cur]?"▼":"▶"} ⚠️ Análisis de la trampa
+                </button>}
+                {showTrap[cur]&&questions[cur].trap&&<div style={{background:"#F59E0B08",border:"1px solid #F59E0B20",borderRadius:8,padding:"12px 14px",marginTop:4,fontSize:13,color:"#FCD34D",lineHeight:1.6}}>{questions[cur].trap}</div>}
+              </div>}
+            </div>
+
+            <div style={{padding:"10px 20px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",borderTop:"1px solid #1E293B"}}>
+              <button onClick={()=>setCur(p=>Math.max(0,p-1))} disabled={cur===0} style={{padding:"7px 14px",borderRadius:8,fontSize:12,background:"#0B0F1A",color:cur===0?"#1E293B":"#64748B",border:"1px solid #1E293B"}}>← Anterior</button>
+              {allDone?<button onClick={()=>setView("results")} style={{padding:"8px 20px",borderRadius:8,fontSize:13,fontWeight:700,background:catColors[quizMode],color:"#fff"}}>Ver resultados</button>:null}
+              <button onClick={()=>setCur(p=>Math.min(questions.length-1,p+1))} disabled={cur===questions.length-1} style={{padding:"7px 14px",borderRadius:8,fontSize:12,background:"#0B0F1A",color:cur===questions.length-1?"#1E293B":"#64748B",border:"1px solid #1E293B"}}>Siguiente →</button>
+            </div>
+          </div>
+          <div style={{marginTop:8,background:"#111827",border:"1px solid #1E293B",borderRadius:8,padding:"10px 14px"}}>
+            <div style={{display:"flex",gap:3,flexWrap:"wrap"}}>
+              {questions.map((_,i)=>{const a=ans[i];const c=a===undefined?"#1E293B":a===questions[i].correct?"#4ADE80":"#F87171";
+                return <button key={i} onClick={()=>setCur(i)} style={{width:24,height:24,borderRadius:5,fontSize:10,background:i===cur?catColors[quizMode]+"30":c=="#1E293B"?"#0B0F1A":c+"15",color:i===cur?"#F1F5F9":c=="#1E293B"?"#475569":c,border:"1px solid "+(i===cur?catColors[quizMode]:c=="#1E293B"?"#1E293B":c+"40"),display:"flex",alignItems:"center",justifyContent:"center"}}>{i+1}</button>})}
+            </div>
+          </div>
+        </div>}
+
+        {/* ═══════ RESULTADOS ═══════ */}
+        {view==="results" && <div className="fade-up">
+          <div style={{background:"#111827",border:"1px solid #1E293B",borderRadius:14,padding:"26px 22px"}}>
+            <div style={{textAlign:"center",marginBottom:20}}>
+              <div style={{fontSize:48,marginBottom:8}}>{score>=questions.length*0.8?"🏆":score>=questions.length*0.6?"👍":"📖"}</div>
+              <h2 style={{fontSize:28,fontWeight:700,color:"#F1F5F9"}}>{score} / {questions.length}</h2>
+              <div style={{fontSize:16,color:"#64748B"}}>{Math.round(score/questions.length*100)}% — {cats[quizMode]}</div>
+              <p style={{color:"#94A3B8",fontSize:14,marginTop:8}}>{score>=questions.length*0.8?"¡Dominas este bloque!":score>=questions.length*0.6?"Buen nivel, refuerza las que fallaste.":"Necesitas repasar la teoría de este bloque."}</p>
+            </div>
+            <div style={{display:"grid",gap:6,marginBottom:16}}>
+              {questions.map((q,i)=>{
+                const correct=ans[i]===q.correct;
+                return <div key={i} style={{background:correct?"#4ADE8008":"#F8717108",border:"1px solid "+(correct?"#4ADE8018":"#F8717118"),borderRadius:6,padding:"8px 12px"}}>
+                  <div style={{fontSize:12,color:correct?"#4ADE80":"#F87171",fontWeight:600}}>{correct?"✅":"❌"} P{i+1}: {q.q.substring(0,85)}...</div>
+                  {!correct&&<div style={{fontSize:12,color:"#4ADE80",marginTop:3}}>✓ {q.opts[q.correct]}</div>}
+                  {!correct&&q.trap&&<div style={{fontSize:11,color:"#FCD34D",marginTop:2}}>⚠️ {q.trap.substring(0,100)}...</div>}
+                </div>
+              })}
+            </div>
+            <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+              <button onClick={()=>startQuiz(quizMode)} style={{padding:"10px 22px",borderRadius:9,fontSize:14,fontWeight:700,background:catColors[quizMode],color:"#fff"}}>🔄 Reintentar</button>
+              <button onClick={()=>{setView("quiz");setCur(0)}} style={{padding:"10px 22px",borderRadius:9,fontSize:14,background:"#1E293B",color:"#94A3B8",border:"1px solid #334155"}}>📋 Revisar</button>
+              <button onClick={()=>{setView("menu");setQuizMode(null)}} style={{padding:"10px 22px",borderRadius:9,fontSize:14,background:"#1E293B",color:"#94A3B8",border:"1px solid #334155"}}>← Menú</button>
+            </div>
+          </div>
+        </div>}
+
+        <div style={{textAlign:"center",marginTop:20,fontSize:10,color:"#334155"}}>EGEL Plus® ISOFT · Subárea 1.3 · Documentación de Requerimientos · Bibliografía oficial</div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
